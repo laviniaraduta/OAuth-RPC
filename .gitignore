@@ -1,0 +1,10 @@
+*
+!tests/
+!*.c
+!*.cpp
+!*.h
+!*.x
+!*.md
+!Makefile
+!.gitignore
+!*.sh
