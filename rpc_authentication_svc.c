@@ -24,6 +24,7 @@ authentication_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		struct access_token_request request_access_token_1_arg;
 		struct validate_delegated_action_request validate_delegated_action_1_arg;
 		char *aprove_request_token_1_arg;
+		struct refresh_token_request refresh_token_operation_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -54,8 +55,14 @@ authentication_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 
 	case aprove_request_token:
 		_xdr_argument = (xdrproc_t) xdr_wrapstring;
-		_xdr_result = (xdrproc_t) xdr_aprove_request_token_response;
+		_xdr_result = (xdrproc_t) xdr_operation_status_t;
 		local = (char *(*)(char *, struct svc_req *)) aprove_request_token_1_svc;
+		break;
+
+	case refresh_token_operation:
+		_xdr_argument = (xdrproc_t) xdr_refresh_token_request;
+		_xdr_result = (xdrproc_t) xdr_refresh_token_response;
+		local = (char *(*)(char *, struct svc_req *)) refresh_token_operation_1_svc;
 		break;
 
 	default:

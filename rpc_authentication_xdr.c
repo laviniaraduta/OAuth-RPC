@@ -6,11 +6,21 @@
 #include "rpc_authentication.h"
 
 bool_t
+xdr_operation_status_t (XDR *xdrs, operation_status_t *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_enum (xdrs, (enum_t *) objp))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
 xdr_request_authorization_response (XDR *xdrs, request_authorization_response *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_int (xdrs, &objp->status))
+	 if (!xdr_operation_status_t (xdrs, &objp->status))
 		 return FALSE;
 	 if (!xdr_string (xdrs, &objp->authorization_token, ~0))
 		 return FALSE;
@@ -26,6 +36,8 @@ xdr_access_token_request (XDR *xdrs, access_token_request *objp)
 		 return FALSE;
 	 if (!xdr_string (xdrs, &objp->authorization_token, ~0))
 		 return FALSE;
+	 if (!xdr_int (xdrs, &objp->autorefresh))
+		 return FALSE;
 	return TRUE;
 }
 
@@ -34,7 +46,7 @@ xdr_access_token_response (XDR *xdrs, access_token_response *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_int (xdrs, &objp->status))
+	 if (!xdr_operation_status_t (xdrs, &objp->status))
 		 return FALSE;
 	 if (!xdr_string (xdrs, &objp->access_token, ~0))
 		 return FALSE;
@@ -64,17 +76,31 @@ xdr_validate_delegated_action_response (XDR *xdrs, validate_delegated_action_res
 {
 	register int32_t *buf;
 
-	 if (!xdr_int (xdrs, &objp->status))
+	 if (!xdr_operation_status_t (xdrs, &objp->status))
 		 return FALSE;
 	return TRUE;
 }
 
 bool_t
-xdr_aprove_request_token_response (XDR *xdrs, aprove_request_token_response *objp)
+xdr_refresh_token_request (XDR *xdrs, refresh_token_request *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_int (xdrs, &objp->status))
+	 if (!xdr_string (xdrs, &objp->refresh_token, ~0))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
+xdr_refresh_token_response (XDR *xdrs, refresh_token_response *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_string (xdrs, &objp->new_access_token, ~0))
+		 return FALSE;
+	 if (!xdr_string (xdrs, &objp->new_refresh_token, ~0))
+		 return FALSE;
+	 if (!xdr_int (xdrs, &objp->token_expiration))
 		 return FALSE;
 	return TRUE;
 }

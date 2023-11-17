@@ -1,15 +1,30 @@
+enum operation_status_t {
+    USER_FOUND,
+	USER_NOT_FOUND,
+    SIGNED,
+    NOT_SIGNED,
+    ACCESS_GRANTED,
+	REQUEST_DENIED,
+	PERMISSION_DENIED,
+	TOKEN_EXPIRED,
+	RESOURCE_NOT_FOUND,
+	OPERATION_NOT_PERMITTED,
+	PERMISSION_GRANTED
+};
+
 struct request_authorization_response {
-    int status;
+    operation_status_t status;
     string authorization_token<>;
 };
 
 struct access_token_request {
     string user_id<>;
     string authorization_token<>;
+    int autorefresh;
 };
 
 struct access_token_response {
-    int status;
+    operation_status_t status;
     string access_token<>;
     string refresh_token<>;
     int token_expiration;
@@ -22,11 +37,17 @@ struct validate_delegated_action_request {
 };
 
 struct validate_delegated_action_response {
-    int status;
+    operation_status_t status;
 };
 
-struct aprove_request_token_response {
-    int status;
+struct refresh_token_request {
+    string refresh_token<>;
+};
+
+struct refresh_token_response {
+    string new_access_token<>;
+    string new_refresh_token<>;
+    int token_expiration;
 };
 
 program AUTHENTICATION_PROG {
@@ -34,6 +55,7 @@ program AUTHENTICATION_PROG {
         struct request_authorization_response request_authorization(string) = 1;
         struct access_token_response request_access_token(struct access_token_request) = 2;
         struct validate_delegated_action_response validate_delegated_action(struct validate_delegated_action_request) = 3;
-        struct aprove_request_token_response aprove_request_token(string) = 4;
+        operation_status_t aprove_request_token(string) = 4;
+        struct refresh_token_response refresh_token_operation(struct refresh_token_request) = 5;
     } = 1;
 } = 1;

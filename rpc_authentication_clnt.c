@@ -54,15 +54,30 @@ validate_delegated_action_1(struct validate_delegated_action_request *argp, CLIE
 	return (&clnt_res);
 }
 
-struct aprove_request_token_response *
+operation_status_t *
 aprove_request_token_1(char **argp, CLIENT *clnt)
 {
-	static struct aprove_request_token_response clnt_res;
+	static operation_status_t clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, aprove_request_token,
 		(xdrproc_t) xdr_wrapstring, (caddr_t) argp,
-		(xdrproc_t) xdr_aprove_request_token_response, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_operation_status_t, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+struct refresh_token_response *
+refresh_token_operation_1(struct refresh_token_request *argp, CLIENT *clnt)
+{
+	static struct refresh_token_response clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, refresh_token_operation,
+		(xdrproc_t) xdr_refresh_token_request, (caddr_t) argp,
+		(xdrproc_t) xdr_refresh_token_response, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}

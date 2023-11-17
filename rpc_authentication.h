@@ -14,8 +14,23 @@ extern "C" {
 #endif
 
 
+enum operation_status_t {
+	USER_FOUND = 0,
+	USER_NOT_FOUND = 1,
+	SIGNED = 2,
+	NOT_SIGNED = 3,
+	ACCESS_GRANTED = 4,
+	REQUEST_DENIED = 5,
+	PERMISSION_DENIED = 6,
+	TOKEN_EXPIRED = 7,
+	RESOURCE_NOT_FOUND = 8,
+	OPERATION_NOT_PERMITTED = 9,
+	PERMISSION_GRANTED = 10,
+};
+typedef enum operation_status_t operation_status_t;
+
 struct request_authorization_response {
-	int status;
+	operation_status_t status;
 	char *authorization_token;
 };
 typedef struct request_authorization_response request_authorization_response;
@@ -23,11 +38,12 @@ typedef struct request_authorization_response request_authorization_response;
 struct access_token_request {
 	char *user_id;
 	char *authorization_token;
+	int autorefresh;
 };
 typedef struct access_token_request access_token_request;
 
 struct access_token_response {
-	int status;
+	operation_status_t status;
 	char *access_token;
 	char *refresh_token;
 	int token_expiration;
@@ -42,14 +58,21 @@ struct validate_delegated_action_request {
 typedef struct validate_delegated_action_request validate_delegated_action_request;
 
 struct validate_delegated_action_response {
-	int status;
+	operation_status_t status;
 };
 typedef struct validate_delegated_action_response validate_delegated_action_response;
 
-struct aprove_request_token_response {
-	int status;
+struct refresh_token_request {
+	char *refresh_token;
 };
-typedef struct aprove_request_token_response aprove_request_token_response;
+typedef struct refresh_token_request refresh_token_request;
+
+struct refresh_token_response {
+	char *new_access_token;
+	char *new_refresh_token;
+	int token_expiration;
+};
+typedef struct refresh_token_response refresh_token_response;
 
 #define AUTHENTICATION_PROG 1
 #define AUTHENTICATION_VERS 1
@@ -65,8 +88,11 @@ extern  struct access_token_response * request_access_token_1_svc(struct access_
 extern  struct validate_delegated_action_response * validate_delegated_action_1(struct validate_delegated_action_request *, CLIENT *);
 extern  struct validate_delegated_action_response * validate_delegated_action_1_svc(struct validate_delegated_action_request *, struct svc_req *);
 #define aprove_request_token 4
-extern  struct aprove_request_token_response * aprove_request_token_1(char **, CLIENT *);
-extern  struct aprove_request_token_response * aprove_request_token_1_svc(char **, struct svc_req *);
+extern  operation_status_t * aprove_request_token_1(char **, CLIENT *);
+extern  operation_status_t * aprove_request_token_1_svc(char **, struct svc_req *);
+#define refresh_token_operation 5
+extern  struct refresh_token_response * refresh_token_operation_1(struct refresh_token_request *, CLIENT *);
+extern  struct refresh_token_response * refresh_token_operation_1_svc(struct refresh_token_request *, struct svc_req *);
 extern int authentication_prog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -80,28 +106,35 @@ extern  struct access_token_response * request_access_token_1_svc();
 extern  struct validate_delegated_action_response * validate_delegated_action_1();
 extern  struct validate_delegated_action_response * validate_delegated_action_1_svc();
 #define aprove_request_token 4
-extern  struct aprove_request_token_response * aprove_request_token_1();
-extern  struct aprove_request_token_response * aprove_request_token_1_svc();
+extern  operation_status_t * aprove_request_token_1();
+extern  operation_status_t * aprove_request_token_1_svc();
+#define refresh_token_operation 5
+extern  struct refresh_token_response * refresh_token_operation_1();
+extern  struct refresh_token_response * refresh_token_operation_1_svc();
 extern int authentication_prog_1_freeresult ();
 #endif /* K&R C */
 
 /* the xdr functions */
 
 #if defined(__STDC__) || defined(__cplusplus)
+extern  bool_t xdr_operation_status_t (XDR *, operation_status_t*);
 extern  bool_t xdr_request_authorization_response (XDR *, request_authorization_response*);
 extern  bool_t xdr_access_token_request (XDR *, access_token_request*);
 extern  bool_t xdr_access_token_response (XDR *, access_token_response*);
 extern  bool_t xdr_validate_delegated_action_request (XDR *, validate_delegated_action_request*);
 extern  bool_t xdr_validate_delegated_action_response (XDR *, validate_delegated_action_response*);
-extern  bool_t xdr_aprove_request_token_response (XDR *, aprove_request_token_response*);
+extern  bool_t xdr_refresh_token_request (XDR *, refresh_token_request*);
+extern  bool_t xdr_refresh_token_response (XDR *, refresh_token_response*);
 
 #else /* K&R C */
+extern bool_t xdr_operation_status_t ();
 extern bool_t xdr_request_authorization_response ();
 extern bool_t xdr_access_token_request ();
 extern bool_t xdr_access_token_response ();
 extern bool_t xdr_validate_delegated_action_request ();
 extern bool_t xdr_validate_delegated_action_response ();
-extern bool_t xdr_aprove_request_token_response ();
+extern bool_t xdr_refresh_token_request ();
+extern bool_t xdr_refresh_token_response ();
 
 #endif /* K&R C */
 

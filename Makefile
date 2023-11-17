@@ -11,7 +11,7 @@ generate:
 	$(RPC) -h rpc_authentication.x -o rpc_authentication.h
 
 build:
-	$(CC) -o server -g  server.cpp rpc_authentication_svc.c rpc_authentication_xdr.c $(LDFLAGS)
+	$(CC) -o server -g  server.cpp authentication_server.cpp resource_server.cpp end_user.cpp rpc_authentication_xdr.c $(LDFLAGS)
 	$(CC) -o client -g  client.cpp rpc_authentication_clnt.c rpc_authentication_xdr.c $(LDFLAGS)
 
 clean:
