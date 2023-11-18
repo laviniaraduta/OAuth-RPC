@@ -43,10 +43,10 @@ extern unordered_map <string, string> user_tokens;
 // access token --> auth request token
 extern unordered_map <string, string> access_req_tokens;
 
-// set that keep the approved authentication request tokens
+// set that keeps the approved authorization request tokens
 extern unordered_set <string> approved_tokens;
 
-// map that keeps the authentication token and the permissions associated with it
+// map that keeps the authorization token and the permissions associated with it
 // auth request token --> permissions
 extern unordered_map <string, vector<permission_t>> auth_token_permissions;
 

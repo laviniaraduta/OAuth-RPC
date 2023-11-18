@@ -10,6 +10,7 @@ void print_operation_result(string result, string operation, string resource, st
         << token_valability << ")" << endl;
 }
 
+// function used to approve/deny a user access to a resource
 validate_delegated_action_response * validate_delegated_action_1_svc(struct validate_delegated_action_request *req, struct svc_req *) {
     static struct validate_delegated_action_response *response;
 
@@ -23,10 +24,11 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
     string user_accessed_resource(req->accessed_resource);
     string user_access_token(req->access_token);
 
-    // now check if the access token provided is valid (if it matches the one in the database)
+    // now check if the access token provided is valid (if it matches one in the database)
     if (access_req_tokens.find(user_access_token) != access_req_tokens.end()) {
 
         string req_auth_token = access_req_tokens[user_access_token];
+
         // the access token was found in the database, now check the token valability
         if (access_token_valability[user_access_token] != 0) {
             // the token is not expired
@@ -41,6 +43,7 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
 
                 permission_type_t user_permission_request;
 
+                // convert the user operation to the permission type requested
                 if (user_operation == "READ") {
                     user_permission_request = READ;
                 } else if (user_operation == "INSERT") {
@@ -61,9 +64,6 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
                             has_access = true;
                             response->status = PERMISSION_GRANTED;
                             access_token_valability[user_access_token]--;
-                            if (access_token_valability[user_access_token] == 0) {
-                                access_token_valability.erase(user_access_token);
-                            }
                             print_operation_result("PERMIT", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
                             return response;
                         }
@@ -73,9 +73,6 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
                 if (!has_access) {
                     response->status = OPERATION_NOT_PERMITTED;
                     access_token_valability[user_access_token]--;
-                    if (access_token_valability[user_access_token] == 0) {
-                        access_token_valability.erase(user_access_token);
-                    }
                     print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
                     return response;
                 }
@@ -83,24 +80,16 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
             } else {
                 response->status = RESOURCE_NOT_FOUND;
                 access_token_valability[user_access_token]--;
-                if (access_token_valability[user_access_token] == 0) {
-                    access_token_valability.erase(user_access_token);
-                }
                 print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
                 return response;
             }
         } else {
             response->status = TOKEN_EXPIRED;
-            access_token_valability[user_access_token]--;
-            if (access_token_valability[user_access_token] == 0) {
-                access_token_valability.erase(user_access_token);
-            }
+            // delete the access token from the database
+            access_token_valability.erase(user_access_token);
             print_operation_result("DENY", user_operation, user_accessed_resource, "", 0);
             return response;
         }
-
-
-
     } else {
         response->status = PERMISSION_DENIED;
         print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);

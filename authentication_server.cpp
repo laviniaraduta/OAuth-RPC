@@ -44,10 +44,12 @@ struct access_token_response *request_access_token_1_svc(struct access_token_req
 
     response = (struct access_token_response *)malloc(sizeof(*response));
     char *auth_token = request->authorization_token;
+
+    // check if the authorization token was signed
     if (approved_tokens.find(auth_token) != approved_tokens.end()) {
         char *access_token = generate_access_token(auth_token);
 
-        // keep the connection between authentication request token and access token
+        // keep the connection between authorization request token and access token
         access_req_tokens[access_token] = auth_token;
 
         // update the request auth token with the access token
@@ -83,6 +85,7 @@ struct access_token_response *request_access_token_1_svc(struct access_token_req
     }
 }
 
+// function used for refreshing the access and refresh tokens of a user
 struct refresh_token_response * refresh_token_operation_1_svc(struct refresh_token_request *request, struct svc_req *rqstp) {
     static struct refresh_token_response *response;
 

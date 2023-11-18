@@ -5,6 +5,7 @@
 unordered_set <string> approved_tokens;
 unordered_map <string, vector<permission_t>> auth_token_permissions;
 
+// function used to sign the authorization tokens and associate them with the permissions
 operation_status_t * aprove_request_token_1_svc(char **auth_req_token, struct svc_req *) {
     static operation_status_t response;
     
