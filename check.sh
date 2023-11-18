@@ -7,7 +7,7 @@
 #
 # Completati/schimbati urmatoarele valori inainte de utilizare:
 SERVER_NAME="server"
-SERVER_PARAMS="tests/test$1/userIDs.db tests/test$1/resources.db tests/test$1/approvals.db 2"
+SERVER_PARAMS="tests/test$1/userIDs.db tests/test$1/resources.db tests/test$1/approvals.db"
 CLIENT_NAME="client"
 CLIENT_PARAMS="tests/test$1/client.in"
 SERVER_ADDR="localhost"
@@ -22,9 +22,22 @@ if [ "$SERVER_NAME" = "" ] || [ "$CLIENT_NAME" = "" ]; then
     exit
 fi
 
+case $1 in
+    '2' | '3')
+      TOKEN_LIFETIME=2;;
+    '4' | '7')
+      TOKEN_LIFETIME=3;;
+    '5')
+      TOKEN_LIFETIME=4;;
+    '6')
+      TOKEN_LIFETIME=5;;
+    *)
+      TOKEN_LIFETIME=0;;
+esac
+
 numberPattern='^[0-9]+$'
 if [[ $1 =~ $numberPattern ]]; then
-    ./$SERVER_NAME $SERVER_PARAMS > server.out &
+    ./$SERVER_NAME $SERVER_PARAMS $TOKEN_LIFETIME > server.out &
     SERVER_PID=$!
     sleep 1
     ./$CLIENT_NAME $SERVER_ADDR $CLIENT_PARAMS > client.out
@@ -63,9 +76,21 @@ if [[ $1 =~ $numberPattern ]]; then
 else
     for i in {1..7}
     do
+        case $i in
+            2 | 3)
+              TOKEN_LIFETIME=2;;
+            4 | 7)
+              TOKEN_LIFETIME=3;;
+            5)
+              TOKEN_LIFETIME=4;;
+            6)
+              TOKEN_LIFETIME=5;;
+            *)
+              TOKEN_LIFETIME=0;;
+        esac
         SERVER_PARAMS_ALL=${SERVER_PARAMS//testall/test$i}
         CLIENT_PARAMS_ALL=${CLIENT_PARAMS//testall/test$i}
-        ./$SERVER_NAME $SERVER_PARAMS_ALL > server.out &
+        ./$SERVER_NAME $SERVER_PARAMS_ALL $TOKEN_LIFETIME > server.out &
         SERVER_PID=$!
         sleep 1
         ./$CLIENT_NAME $SERVER_ADDR $CLIENT_PARAMS_ALL > client.out

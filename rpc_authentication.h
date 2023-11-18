@@ -64,6 +64,7 @@ typedef struct validate_delegated_action_response validate_delegated_action_resp
 
 struct refresh_token_request {
 	char *refresh_token;
+	char *access_token;
 };
 typedef struct refresh_token_request refresh_token_request;
 

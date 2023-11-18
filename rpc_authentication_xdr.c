@@ -88,6 +88,8 @@ xdr_refresh_token_request (XDR *xdrs, refresh_token_request *objp)
 
 	 if (!xdr_string (xdrs, &objp->refresh_token, ~0))
 		 return FALSE;
+	 if (!xdr_string (xdrs, &objp->access_token, ~0))
+		 return FALSE;
 	return TRUE;
 }
 

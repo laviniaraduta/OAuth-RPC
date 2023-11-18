@@ -42,6 +42,7 @@ struct validate_delegated_action_response {
 
 struct refresh_token_request {
     string refresh_token<>;
+    string access_token<>;
 };
 
 struct refresh_token_response {

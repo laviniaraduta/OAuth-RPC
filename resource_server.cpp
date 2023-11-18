@@ -28,7 +28,7 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
 
         string req_auth_token = access_req_tokens[user_access_token];
         // the access token was found in the database, now check the token valability
-        if (access_tokens_with_autorefresh[user_access_token] != 0) {
+        if (access_token_valability[user_access_token] != 0) {
             // the token is not expired
             // now check if the resource exists
             if (resources.find(user_accessed_resource) != resources.end()) {
@@ -60,11 +60,11 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
                         if (resource_permissions.find(user_permission_request) != resource_permissions.end()) {
                             has_access = true;
                             response->status = PERMISSION_GRANTED;
-                            access_tokens_with_autorefresh[user_access_token]--;
-                            if (access_tokens_with_autorefresh[user_access_token] == 0) {
-                                access_tokens_with_autorefresh.erase(user_access_token);
+                            access_token_valability[user_access_token]--;
+                            if (access_token_valability[user_access_token] == 0) {
+                                access_token_valability.erase(user_access_token);
                             }
-                            print_operation_result("PERMIT", user_operation, user_accessed_resource, user_access_token, access_tokens_with_autorefresh[user_access_token]);
+                            print_operation_result("PERMIT", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
                             return response;
                         }
                     }
@@ -72,28 +72,28 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
 
                 if (!has_access) {
                     response->status = OPERATION_NOT_PERMITTED;
-                    access_tokens_with_autorefresh[user_access_token]--;
-                    if (access_tokens_with_autorefresh[user_access_token] == 0) {
-                        access_tokens_with_autorefresh.erase(user_access_token);
+                    access_token_valability[user_access_token]--;
+                    if (access_token_valability[user_access_token] == 0) {
+                        access_token_valability.erase(user_access_token);
                     }
-                    print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_tokens_with_autorefresh[user_access_token]);
+                    print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
                     return response;
                 }
 
             } else {
                 response->status = RESOURCE_NOT_FOUND;
-                access_tokens_with_autorefresh[user_access_token]--;
-                if (access_tokens_with_autorefresh[user_access_token] == 0) {
-                    access_tokens_with_autorefresh.erase(user_access_token);
+                access_token_valability[user_access_token]--;
+                if (access_token_valability[user_access_token] == 0) {
+                    access_token_valability.erase(user_access_token);
                 }
-                print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_tokens_with_autorefresh[user_access_token]);
+                print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
                 return response;
             }
         } else {
             response->status = TOKEN_EXPIRED;
-            access_tokens_with_autorefresh[user_access_token]--;
-            if (access_tokens_with_autorefresh[user_access_token] == 0) {
-                access_tokens_with_autorefresh.erase(user_access_token);
+            access_token_valability[user_access_token]--;
+            if (access_token_valability[user_access_token] == 0) {
+                access_token_valability.erase(user_access_token);
             }
             print_operation_result("DENY", user_operation, user_accessed_resource, "", 0);
             return response;
@@ -103,7 +103,7 @@ validate_delegated_action_response * validate_delegated_action_1_svc(struct vali
 
     } else {
         response->status = PERMISSION_DENIED;
-        print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_tokens_with_autorefresh[user_access_token]);
+        print_operation_result("DENY", user_operation, user_accessed_resource, user_access_token, access_token_valability[user_access_token]);
         return response;
     }
 

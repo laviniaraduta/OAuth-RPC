@@ -9,8 +9,14 @@ using namespace std;
 #define DELIM ','
 
 int no_of_users, no_of_resources, token_valability;
+
+// set of user ids
 unordered_set <string> user_ids;
+
+// set of resource names
 unordered_set <string> resources;
+
+// queue of allowed permissions for each user
 queue<vector<permission_t>> permissions;
 
 void read_clients_file(string filename) {
@@ -41,18 +47,21 @@ void read_resources_file(string filename) {
     infile.close();
 }
 
+// function used to read the approvals file
 void read_approvals_file(string filename) {
     ifstream infile(filename.c_str());
     string line;
 
     while (getline(infile, line)) {
-        int pos = line.find(DELIM);
         vector<permission_t> user_permissions;
 
         if (line == "*,-") {
+            // the user does not have any permissions
             permissions.push(user_permissions);
             continue;
         }
+
+        int pos = line.find(DELIM);
 
         while (pos != string::npos) {
             string resouce_name = line.substr(0, pos);
@@ -62,6 +71,7 @@ void read_approvals_file(string filename) {
             string permission_type = line.substr(0, pos);
             line.erase(0, pos + 1);
 
+            // each resource has a set of permissions
             unordered_set <permission_type_t> resource_perms;
 
             for (char c : permission_type) {
@@ -87,7 +97,6 @@ void read_approvals_file(string filename) {
         }
         permissions.push(user_permissions);
     }
-
     infile.close();
 }
 
@@ -108,7 +117,6 @@ int main(int argc, char *argv[])
     read_approvals_file(argv[3]);
 
     token_valability = stoi(argv[4]);
-
 
     // Start the RPC server
     register SVCXPRT *transp;
